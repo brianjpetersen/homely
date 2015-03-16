@@ -2,6 +2,7 @@
 import os
 import sys
 import copy
+import itertools
 # third party libraries
 from PyQt4 import QtGui, QtCore
 from serial.tools.list_ports import comports as list_serial_ports

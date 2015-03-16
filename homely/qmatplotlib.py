@@ -1,7 +1,7 @@
 # standard libraries
 pass
 # third party libraries
-from PySide import QtGui, QtCore
+from PyQt4 import QtGui, QtCore
 import numpy
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
