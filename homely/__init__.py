@@ -43,6 +43,10 @@ class QConsoleLog(QtGui.QPlainTextEdit):
         self.moveCursor(QtGui.QTextCursor.End)
         self.insertPlainText(s)
 
+    def _get_text(self):
+        return self.toPlainText()
+    text = property(_get_text)
+
 class QFormLayout(QtGui.QFormLayout):
 
     def __init__(self, *args, **kwargs):
@@ -94,7 +98,7 @@ class QViewComboBox(QtGui.QWidget):
         self.update_items()
 
         self.refreshButton = QtGui.QPushButton()
-        fname = os.path.join(os.path.dirname(__file__), 'reload.png')
+        fname = os.path.join(_where, 'reload.png')
         self.refreshButton.setIcon(QtGui.QIcon(fname))
         self.refreshButton.setFixedSize(24, 24)
 
@@ -105,13 +109,21 @@ class QViewComboBox(QtGui.QWidget):
         main_layout.addWidget(self.refreshButton)
 
     def update_items(self):
+        self.ComboBox.blockSignals(True)
         current_item_selected = copy.deepcopy(self.selected_item)
         new_items = self._view()
         self.ComboBox.clear()
         self.ComboBox.addItems(list(new_items))
+        current_item_reselected = False
         for indx in range(self.ComboBox.count()):
             if self.ComboBox.itemText(indx) == current_item_selected:
                 self.ComboBox.setCurrentIndex(indx)
+                current_item_reselected = True
+                break
+        self.ComboBox.blockSignals(False)
+        if not current_item_reselected:
+            indx = 0
+        self.ComboBox.currentIndexChanged.emit(indx)
 
     def currentIndex(self):
         indx = self.ComboBox.currentIndex()

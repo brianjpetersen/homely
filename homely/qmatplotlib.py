@@ -13,13 +13,16 @@ class QImageCanvas(FigureCanvas):
     def __init__(self, a, *args, **kwargs):
         figure = self.figure = Figure(frameon=True)
         figure.patch.set_alpha(0.0)
-        self.axis = figure.add_subplot(111)
-        self.axis.get_xaxis().set_visible(False)
-        self.axis.get_yaxis().set_visible(False)
-        figure.tight_layout()
+        axis = self.axis = figure.add_subplot(111)
+        axis.get_xaxis().set_visible(False)
+        axis.get_yaxis().set_visible(False)
         super(QImageCanvas, self).__init__(figure)
-        self.imshow(a, *args, **kwargs)
+        image = self.image = axis.imshow(a, *args, **kwargs)
+        figure.tight_layout()
 
     def imshow(self, a, *args, **kwargs):
         self.axis.imshow(a, *args, **kwargs)
         self.draw()
+
+    def save(self, *args, **kwargs):
+        self.figure.savefig(*args, **kwargs)
