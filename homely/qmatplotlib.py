@@ -17,12 +17,16 @@ class QImageCanvas(FigureCanvas):
         axis.get_xaxis().set_visible(False)
         axis.get_yaxis().set_visible(False)
         super(QImageCanvas, self).__init__(figure)
-        image = self.image = axis.imshow(a, *args, **kwargs)
+        self.imshow(a, *args, **kwargs)
         figure.tight_layout()
 
     def imshow(self, a, *args, **kwargs):
-        self.axis.imshow(a, *args, **kwargs)
+        self.image = self.axis.imshow(a, *args, **kwargs)
         self.draw()
+        return self.image
+
+    def set_clim(self, cmin, cmax):
+        self.image
 
     def save(self, *args, **kwargs):
         self.figure.savefig(*args, **kwargs)

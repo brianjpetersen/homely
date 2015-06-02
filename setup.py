@@ -12,7 +12,7 @@ author_email = None
 
 def load_file(fname, default=None):
     try:
-        with open(fname, 'rb') as f:
+        with open(fname, 'r') as f:
             d = f.read()
     except:
         d = default

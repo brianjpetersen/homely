@@ -15,7 +15,7 @@ try:
 except ImportError:
     pass
 # first party libraries
-import qmatplotlib as matplotlib
+from . import qmatplotlib as matplotlib
 
 _where = os.path.dirname(os.path.abspath(__file__))
 
@@ -38,6 +38,9 @@ class QConsoleLog(QtGui.QPlainTextEdit):
             sys.stdout = self
         if stderr:
             sys.stderr = self
+
+    def flush(self):
+        pass
 
     def write(self, s):
         self.moveCursor(QtGui.QTextCursor.End)
@@ -167,14 +170,14 @@ class QSerialPortSelector(QViewComboBox):
 class QPeripheralDriveSelector(QViewComboBox):
 
     def __init__(self, *args, **kwargs):
-        super(QSerialPortSelector, self).__init__(self.available_serial_ports, *args, **kwargs)
+        super(QPeripheralDriveSelector, self).__init__(self.available_peripheral_drives, *args, **kwargs)
 
-    def available_peripheral_drives():
+    def available_peripheral_drives(self):
         """ NB: this is only set up for Windows machines currently.
         """
         try:
             drives = win32api.GetLogicalDriveStrings()
-            drives = [drive for drive in drives.split('\000') if drive and drive <> 'C:\\']
+            drives = [drive for drive in drives.split('\000') if drive and drive != 'C:\\']
             return drives
         except:
             return []
