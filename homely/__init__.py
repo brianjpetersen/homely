@@ -4,8 +4,11 @@ import sys
 import copy
 import itertools
 # third party libraries
-from PyQt4 import QtGui, QtCore
-from serial.tools.list_ports import comports as list_serial_ports
+from qtpy import QtGui, QtCore, QtWidgets
+try:
+    from serial.tools.list_ports import comports as list_serial_ports
+except:
+    pass
 try:
     import _winreg as winreg
 except ImportError:
@@ -17,19 +20,22 @@ except ImportError:
 # first party libraries
 from . import qmatplotlib as matplotlib
 
-_where = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(_where, '..', 'VERSION'), 'rb') as f:
+__where__ = os.path.dirname(os.path.abspath(__file__))
+
+
+with open(os.path.join(__where__, '..', 'VERSION'), 'rb') as f:
     __version__ = f.read()
 
-class QConsoleLog(QtGui.QPlainTextEdit):
+
+class QConsoleLog(QtWidgets.QPlainTextEdit):
 
     def __init__(self, stdout=True, stderr=True, *args, **kwargs):
         super(QConsoleLog, self).__init__(*args, **kwargs)
         # only allow reads
         self.setReadOnly(True)
         # change default colors
-        palette = QtGui.QPalette()
+        palette = QtWidgets.QPalette()
         palette.setColor(QtGui.QPalette.Base, QtGui.QColor(0, 0, 0))
         palette.setColor(QtGui.QPalette.Text, QtGui.QColor(255, 255, 255))
         self.setPalette(palette)
@@ -43,14 +49,15 @@ class QConsoleLog(QtGui.QPlainTextEdit):
         pass
 
     def write(self, s):
-        self.moveCursor(QtGui.QTextCursor.End)
+        self.moveCursor(QtWidgets.QTextCursor.End)
         self.insertPlainText(s)
 
     def _get_text(self):
         return self.toPlainText()
     text = property(_get_text)
 
-class QFormLayout(QtGui.QFormLayout):
+
+class QFormLayout(QtWidgets.QFormLayout):
 
     def __init__(self, *args, **kwargs):
         super(QFormLayout, self).__init__(*args, **kwargs)
@@ -67,10 +74,10 @@ class QFormLayout(QtGui.QFormLayout):
         label.setEnabled(True)
 
     def addRow(self, label, widget, stretch=True):
-        layout = QtGui.QHBoxLayout()
-        if issubclass(type(widget), QtGui.QLayout):
+        layout = QtWidgets.QHBoxLayout()
+        if issubclass(type(widget), QtWidgets.QLayout):
             layout.addLayout(widget)
-        elif issubclass(type(widget), QtGui.QWidget):
+        elif issubclass(type(widget), QtWidgets.QWidget):
             layout.addWidget(widget)
         else:
             raise ValueError()
@@ -79,14 +86,19 @@ class QFormLayout(QtGui.QFormLayout):
         super(QFormLayout, self).addRow(label, layout)
         self.fieldLabel[widget] = self.labelForField(layout)
 
-class QViewComboBox(QtGui.QWidget):
+
+class QViewComboBox(QtWidgets.QWidget):
+
+    item_selection_changed = QtCore.pyqtSignal()
 
     def __init__(self, view, add_selected=True, sleep=None, editable=False, *args, **kwargs):
         super(QViewComboBox, self).__init__(*args, **kwargs)
-        self.ComboBox = QtGui.QComboBox()
+        self.ComboBox = QtWidgets.QComboBox()
         self.ComboBox.setEditable(editable)
-        main_layout = QtGui.QHBoxLayout()
+        main_layout = QtWidgets.QHBoxLayout()
         main_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.ComboBox.currentIndexChanged.connect(lambda: self.item_selection_changed.emit())
 
         self._view = view
         self.add_selected = add_selected
@@ -100,8 +112,8 @@ class QViewComboBox(QtGui.QWidget):
 
         self.update_items()
 
-        self.refreshButton = QtGui.QPushButton()
-        fname = os.path.join(_where, 'reload.png')
+        self.refreshButton = QtWidgets.QPushButton()
+        fname = os.path.join(__where__, 'reload.png')
         self.refreshButton.setIcon(QtGui.QIcon(fname))
         self.refreshButton.setFixedSize(24, 24)
 
@@ -166,6 +178,7 @@ class QSerialPortSelector(QViewComboBox):
           for port, _, _ in list_serial_ports():
             ports.append(port)
         return ports
+
 
 class QPeripheralDriveSelector(QViewComboBox):
 

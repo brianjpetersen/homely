@@ -6,9 +6,11 @@ pass
 # first party libraries
 pass
 
+
 project_name = 'homely'
 author = 'Brian J Petersen'
 author_email = None
+
 
 def load_file(fname, default=None):
     try:
@@ -17,6 +19,7 @@ def load_file(fname, default=None):
     except:
         d = default
     return d
+
 
 readme = load_file('README.md', '')
 history = load_file('HISTORY.md', '')
